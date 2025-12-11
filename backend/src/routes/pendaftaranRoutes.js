@@ -1,14 +1,16 @@
-import express from "express"
-import { 
+import express from "express";
+import {
     daftar,
     listPendaftaran,
+    getPendaftaran,
     editStatusPendaftaran
 } from "../controllers/pendaftaranController.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.post("/", daftar)
-router.get("/", listPendaftaran)
-router.put("/:id", editStatusPendaftaran)
+router.get("/", listPendaftaran);
+router.post("/", daftar);
+router.get("/:id", getPendaftaran);    
+router.put("/:id", editStatusPendaftaran);
 
-export default router
+export default router;

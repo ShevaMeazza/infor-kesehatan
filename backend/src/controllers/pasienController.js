@@ -21,13 +21,25 @@ export const detailPasien = async (req, res) => {
 };
 
 export const createPasien = async (req, res) => {
-    const result = await tambahPasien(req.body);
+    try {
+        const { nama, nik, tanggal_lahir, alamat, no_hp } = req.body;
 
-    res.json({
-        message: "Berhasil menambahkan pasien",
-        id: result.insertId,
-    });
+        if (!nama || !nik || !tanggal_lahir || !alamat) {
+            return res.status(400).json({ message: "Field wajib diisi" });
+        }
+
+        const result = await tambahPasien({ nama, nik, tanggal_lahir, alamat, no_hp });
+
+        res.status(201).json({
+            message: "Pasien berhasil ditambahkan",
+            insertId: result.insertId  // ← PASTIKAN ADA!
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: err.message });
+    }
 };
+
 
 export const editPasien = async (req, res) => {
     const { id } = req.params;

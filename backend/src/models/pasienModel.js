@@ -10,18 +10,17 @@ export const getPasienById = async (id) => {
     return rows[0]
 }
 
-export const tambahPasien = async (data) => {
-    const { nama, nik, tanggal_lahir, alamat, no_hp } = data
-    const sql = ` INSERT INTO pasien (nama, nik, tanggal_lahir, alamat, no_hp) VALUES (?, ?, ?, ?, ?)`
+export const tambahPasien = async ({ nama, nik, tanggal_lahir, alamat, no_hp }) => {
+    const sql = `
+        INSERT INTO pasien (nama, nik, tanggal_lahir, alamat, no_hp)
+        VALUES (?, ?, ?, ?, ?)
+    `;
     const [result] = await pool.query(sql, [
-        nama,
-        nik,
-        tanggal_lahir,
-        alamat,
-        no_hp,
-    ])
-    return result
-}
+        nama, nik, tanggal_lahir, alamat, no_hp
+    ]);
+    return result; // ← WAJIB return result, bukan rows
+};
+
 
 export const updatePasien = async (id, data) => {
     const { nama, nik, tanggal_lahir, alamat, no_hp } = data
