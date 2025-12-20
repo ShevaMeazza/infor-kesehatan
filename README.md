@@ -1,102 +1,106 @@
-# 🏥 Sistem Informasi Klinik – Backend (Express + MySQL)
+🏥 Klinik App – Sistem Informasi Klinik Terpadu
+Aplikasi web manajemen klinik yang mengintegrasikan alur pelayanan pasien mulai dari pendaftaran, pemeriksaan rekam medis oleh dokter, hingga proses transaksi di kasir.
 
-Backend ini merupakan bagian dari proyek **Sistem Informasi Klinik** menggunakan **Node.js**, **Express**, dan **MySQL**.  
-Fitur mencakup seluruh alur layanan klinik, mulai dari pendaftaran pasien hingga pembayaran.
+🚀 Tech Stack
+Backend (Node.js & Express)
+Runtime: Node.js
 
----
+Framework: Express.js
 
-## 🚀 Tech Stack
+Database: MySQL dengan library mysql2/promise
 
-- **Node.js** – runtime
-- **Express.js** – backend framework
-- **MySQL** – relational database
-- **MySQL2** – database driver
-- **CORS** – akses API
-- **REST API** – komunikasi frontend-backend
+API Style: REST API dengan format JSON
 
----
+Frontend (React & Tailwind)
+Library Utama: React.js (Vite)
 
-## 📦 Fitur Utama Backend
+Styling: Tailwind CSS (Modern & Responsive UI)
 
-### **1. Pasien**
-- Tambah pasien
-- Lihat semua pasien
-- Update pasien
-- Hapus pasien
+State Management: React Hooks (useState, useEffect)
 
-### **2. Poli**
-- Tambah poli
-- Lihat semua poli
+Routing: React Router Dom v6
 
-### **3. Dokter**
-- Tambah dokter
-- Lihat semua dokter
-- Update dokter
-- Hapus dokter
-- Relasi poli → dokter  
-- Harga dokter untuk perhitungan pembayaran
+HTTP Client: Axios
 
-### **4. Obat**
-- Tambah obat
-- Lihat semua obat
-- Update obat
-- Hapus obat
+Alerts: SweetAlert2 untuk feedback interaktif
 
-### **5. Pendaftaran**
-- Tambah pendaftaran pasien
-- Nomor antrian otomatis
-- Update status (menunggu, dipanggil, selesai)
+📦 Fitur Utama
+1. Manajemen Pasien & Antrian
+Registrasi pasien baru ke dalam sistem.
 
-### **6. Rekam Medis**
-- Membuat rekam medis berdasarkan pendaftaran
-- Diisi oleh dokter (keluhan, diagnosa, tindakan)
+Pendaftaran kunjungan pasien dengan Nomor Antrian Otomatis.
 
-### **7. Resep Obat**
-- Tambah resep obat berdasarkan rekam medis
-- Relasi dengan obat dan stok
+Update status antrian secara real-time (Menunggu, Dipanggil, Selesai).
 
-### **8. Pembayaran**
-- Hitung total biaya otomatis:
-  - Total harga obat × jumlah
-  - Biaya dokter
-- Simpan transaksi pembayaran
-- Tandai status sebagai “lunas”
+2. Pemeriksaan Medis (Dokter)
+Pemanggilan data pendaftaran berdasarkan ID.
 
----
+Input data pemeriksaan: Keluhan, Diagnosa, dan Tindakan.
 
-## 🗄️ Database Structure
+Fitur Resep Obat Dinamis: Dokter dapat menambah banyak obat sekaligus dalam satu form tanpa pindah halaman.
 
-Struktur database mencakup tabel:
+3. Manajemen Master Data
+CRUD (Create, Read, Update, Delete) lengkap untuk data Dokter, Poli, dan Obat.
 
-- **pasien**
-- **poli**
-- **dokter**
-- **pendaftaran**
-- **rekam_medis**
-- **obat**
-- **resep_obat**
-- **pembayaran**
+Manajemen stok obat yang berkurang otomatis setiap kali resep dibuat.
 
-Database mengikuti alur layanan klinik dari awal hingga akhir.
+4. Sistem Pembayaran (Kasir)
+Kalkulasi otomatis total biaya berdasarkan:
 
----
+Biaya jasa dokter (berdasarkan poli).
 
-## ⚙️ Cara Menjalankan Backend
+Total harga obat (Harga Satuan × Jumlah).
 
-### 1. Install dependencies
+Status pembayaran otomatis berubah menjadi Lunas setelah transaksi sukses.
+
+🗄️ Struktur Database
+Database klinik terdiri dari tabel-tabel yang saling berelasi:
+
+pasien: Data identitas pasien.
+
+poli: Daftar poliklinik.
+
+dokter: Data dokter beserta spesialis dan biaya jasanya.
+
+pendaftaran: Data antrian harian pasien.
+
+rekam_medis: Catatan kesehatan hasil pemeriksaan.
+
+obat: Inventaris obat dan stok.
+
+resep_obat: Jembatan antara rekam medis dan banyak obat yang diberikan.
+
+pembayaran: Data transaksi keuangan.
+
+⚙️ Instalasi & Cara Menjalankan
+1. Persiapan Database
+Import file SQL database Anda ke MySQL (PHPMyAdmin atau MySQL Workbench).
+
+Pastikan database bernama klinik.
+
+2. Setup Backend
+
+cd backend
 npm install
+Atur koneksi database di file config/db.js:
 
-### 2. Atur koneksi MySQL di `db.js`
-js
+JavaScript
+
 export const pool = createPool({
   host: "localhost",
   user: "root",
-  password: "",
+  password: "", // Kosongkan jika default XAMPP
   database: "klinik"
 });
-disini db nya tidak menggunakan dotenv karena error jadi db nya langsung di db.js nya
 
-### 3. Jalankan Server
+Jalankan server:
 npm run dev
-nanti akan jalan di : http://localhost:5001
-### semua endpoint diuji di POSTMAN
+
+3. Setup Frontend
+
+cd frontend
+npm install
+Pastikan baseURL di src/api/axios.js mengarah ke http://localhost:5001.
+
+Jalankan aplikasi:
+npm run dev
