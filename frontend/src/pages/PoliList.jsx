@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import {useState, useEffect} from "react";
 import api from "../api/axios";
 
 export default function PoliList() {
@@ -25,7 +25,7 @@ export default function PoliList() {
 
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">Daftar Pasien</h2>
+            <h2 className="text-xl font-semibold mb-4">Daftar Poli</h2>
             <table className="w-full table-auto bg-white shadow rounded">
                 <thead className="bg-gray-100">
                     <tr>
@@ -37,7 +37,7 @@ export default function PoliList() {
                     {data.map((pol) => (
                         <tr key={pol.id} className="border-t">
                             <td className="p-2">{pol.id}</td>
-                            <td className="p-2">{pol.nama}</td>                            
+                            <td className="p-2">{pol.nama_poli}</td>                            
                         </tr>
                     ))}
                 </tbody>

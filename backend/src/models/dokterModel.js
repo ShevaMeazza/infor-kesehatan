@@ -1,17 +1,17 @@
-import  pool  from "../config/db.js";
+import pool from "../config/db.js";
 
 export const getAllDokter = async () => {
     const sql = `
-    SELECT dokter.*, poli.nama AS poli
+    SELECT dokter.*, poli.nama_poli AS nama_poli 
     FROM dokter
-    LEFT JOIN poli ON dokter.poli_id = poli.id`
+    LEFT JOIN poli ON dokter.poli_id = poli.id` // Perbaikan: poli.nama menjadi poli.nama_poli
     const [rows] = await pool.query(sql)
     return rows
 }
 
 export const getDokterById = async (id) => {
     const [rows] = await pool.query("SELECT * FROM dokter WHERE id=?", [id])
-    return rows
+    return rows[0] // Bagus jika return baris pertama saja
 }
 
 export const tambahDokter = async (data) => {
@@ -25,9 +25,8 @@ export const tambahDokter = async (data) => {
 
 export const updateDokter = async (id, data) => {
     const {nama, spesialis, poli_id} = data
-    const sql = `UPDATE dokter 
-    SET nama=?, spesialis=?, poli_id=?,
-    WHERE id=?`
+    // Perbaikan: Hapus koma sebelum WHERE
+    const sql = `UPDATE dokter SET nama=?, spesialis=?, poli_id=? WHERE id=?` 
     const [result] = await pool.query(sql, [
         nama, spesialis, poli_id, id
     ])
@@ -35,6 +34,7 @@ export const updateDokter = async (id, data) => {
 }
 
 export const deleteDokter = async (id) => {
-    const [result] = await pool.query("DELETE * FROM dokter WHERE id=?", [id])
+    // Perbaikan: Hapus tanda bintang (*) setelah DELETE
+    const [result] = await pool.query("DELETE FROM dokter WHERE id=?", [id]) 
     return result
 }

@@ -1,6 +1,5 @@
 import pool from "../config/db.js"
 
-// hitung next no_antrian berdasarkan poli & tanggal sekarang
 export const getNextAntrian = async (poli_id) => {
     const sql = `SELECT COUNT(*) AS total FROM pendaftaran WHERE poli_id = ? AND tanggal = CURDATE()`
     const [rows] = await pool.query(sql, [poli_id])
@@ -45,4 +44,35 @@ export const updateStatusPendaftaran = async (id, status) => {
     const sql = `UPDATE pendaftaran SET status = ? WHERE id = ?`
     const [result] = await pool.query(sql, [status, id])
     return result
+}
+
+export const deletePendaftaran = async (id) => {
+    const connection = await pool.getConnection()
+    try {
+        await connection.beginTransaction()
+        
+        const [rmRows] = await connection.query(
+            "SELECT id FROM rekam_medis WHERE pendaftaran_id = ?",
+            [id]
+        )
+
+        if (rmRows.length > 0) {
+            const rmIds = rmRows.map(row => row.id)
+            
+            await connection.query("DELETE FROM resep_obat WHERE rekam_medis_id IN (?)", [rmIds])
+            await connection.query("DELETE FROM pembayaran WHERE rekam_medis_id IN (?)", [rmIds])
+            
+            await connection.query("DELETE FROM rekam_medis WHERE pendaftaran_id = ?", [id])
+        }
+        
+        const [result] = await connection.query("DELETE FROM pendaftaran WHERE id = ?", [id])
+
+        await connection.commit()
+        return result
+    } catch (error) {
+        await connection.rollback()
+        throw error
+    } finally {
+        connection.release()
+    }
 }

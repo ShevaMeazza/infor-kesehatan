@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+// Menggunakan useNavigate untuk navigasi programatik
+import { Link, useNavigate } from "react-router-dom" 
 import api from "../api/axios"
 import Swal from "sweetalert2"
 
-export default function Pendaftaran() {
+export default function Pendaftaran() {    
+    const navigate = useNavigate()
+
+    const [editId, setEditId] = useState(null)
+    const [newStatus, setNewStatus] = useState("")
+    const [showModal, setShowModal] = useState(false)
     const [pendaftaran, setPendaftaran] = useState([])
     const [loading, setLoading] = useState(true)
 
@@ -21,6 +27,39 @@ export default function Pendaftaran() {
     useEffect(() => {
         fetchPendaftaran()
     }, [])
+
+    const StatusBadge = ({status}) => {
+        const colors = {
+            menunggu: "bg-yellow-100 text-yellow-700",
+            dipanggil: "bg-blue-100 text-blue-700",            
+            pemeriksaan: "bg-purple-100 text-purple-700", 
+            selesai: "bg-green-100 text-green-700"
+        }
+        return <span className={`px-3 py-1 rounded text-sm font-medium ${colors[status]}`}>{status}</span>;
+    }
+
+    const openEditModal = (id, currentStatus) => {
+        setEditId(id)
+        setNewStatus(currentStatus)
+        setShowModal(true)
+    }
+
+    const handleUpdateStatus = async () => {
+        try {
+            await api.put(`/pendaftaran/${editId}`, { status: newStatus })
+            Swal.fire("Berhasil", "Status Berhasil diperbarui", "success")
+            setShowModal(false)
+            fetchPendaftaran()
+            
+            if (newStatus === "pemeriksaan") {                
+                navigate(`/rekam-medis/${editId}`)
+            }
+
+        } catch (error) {
+            Swal.fire("Gagal", "Terjadi kesalahan saat update status", "error")
+            console.error("Error update status:", error);
+        }
+    }
 
     const handleDelete = async (id) => {
         const confirm = await Swal.fire({
@@ -77,14 +116,22 @@ export default function Pendaftaran() {
                                     <td className="p-3">{pen.id}</td>
                                     <td className="p-3">{pen.pasien_id}</td>
                                     <td className="p-3">{pen.poli_id}</td>
-                                    <td className="p-3">{pen.tanggal}</td>
-                                    <td className="p-3">{pen.status}</td>
+                                    <td className="p-3">{new Date(pen.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
+                                    <td>
+                                        <StatusBadge status={pen.status} />
+                                    </td>
                                     <td className="p-3">{pen.no_antrian}</td>
 
                                     <td className="p-3 flex gap-2">
                                         <button
+                                            onClick={() => openEditModal(pen.id, pen.status)}
+                                            className="bg-yellow-300 p-3 rounded-lg text-black hover:underline"
+                                        >
+                                            Edit Status
+                                        </button>
+                                        <button
                                             onClick={() => handleDelete(pen.id)}
-                                            className="text-red-600 hover:underline"
+                                            className="bg-red-600 p-3 rounded-lg text-white hover:underline"
                                         >
                                             Hapus
                                         </button>
@@ -95,6 +142,44 @@ export default function Pendaftaran() {
                     </table>
                 </div>
             )}
+            
+            {/* Modal Edit Status */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded shadow-lg w-80">
+                        <h2 className="text-lg font-semibold mb-4">Edit Status</h2>
+
+                        <select
+                            value={newStatus}
+                            onChange={(e) => setNewStatus(e.target.value)}
+                            className="border p-2 rounded w-full mb-4"
+                        >
+                            <option value="menunggu">Menunggu</option>
+                            <option value="dipanggil">Dipanggil</option>
+                            {/* Tambahkan status 'pemeriksaan' di modal */}
+                            <option value="pemeriksaan">Pemeriksaan</option> 
+                            <option value="selesai">Selesai</option>
+                        </select>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="px-3 py-1 bg-gray-300 rounded"
+                            >
+                                Batal
+                            </button>
+
+                            <button
+                                onClick={handleUpdateStatus}
+                                className="px-3 py-1 bg-blue-600 text-white rounded"
+                            >
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }

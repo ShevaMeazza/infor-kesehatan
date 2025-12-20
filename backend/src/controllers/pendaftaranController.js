@@ -3,6 +3,7 @@ import {
     getAllPendaftaran,
     getPendaftaranById,
     updateStatusPendaftaran,
+    deletePendaftaran
 } from "../models/pendaftaranModel.js"
 
 export const daftar = async (req, res) => {
@@ -13,8 +14,7 @@ export const daftar = async (req, res) => {
             return res.status(400).json({ message: "pasien_id dan poli_id wajib" })
         }
 
-        const hasil = await tambahPendaftaran({ pasien_id, poli_id })
-        // kembalikan nomor antrian juga
+        const hasil = await tambahPendaftaran({ pasien_id, poli_id })        
         res.status(201).json({
             message: "Pendaftaran berhasil",
             insertId: hasil.insertId,
@@ -41,8 +41,7 @@ export const getPendaftaran = async (req, res) => {
         const row = await getPendaftaranById(id)
         if (!row)
             return res.status(404).json({ message: "Pendaftaran tidak ditemukan" })
-
-        // return juga alias nomor_antrian supaya frontend mudah
+        
         return res.json({ ...row, nomor_antrian: row.no_antrian })
     } catch (err) {
         res.status(500).json({ message: err.message })
@@ -64,3 +63,19 @@ export const editStatusPendaftaran = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
+
+export const removePendaftaran = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await deletePendaftaran(id);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Data pendaftaran tidak ditemukan" });
+        }
+
+        res.json({ message: "Pendaftaran dan data terkait berhasil dihapus" });
+    } catch (err) {
+        console.error("Error saat menghapus pendaftaran:", err);
+        res.status(500).json({ message: "Gagal menghapus data: " + err.message });
+    }
+};

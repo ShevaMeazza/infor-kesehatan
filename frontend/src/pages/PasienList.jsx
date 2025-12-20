@@ -39,6 +39,7 @@ export default function PasienList() {
             Swal.fire("Berhasil", "Pasien berhasil dihapus!", "success")
             fetchPasien()
         } catch (err) {
+            console.error("Detail Error API:", err.response ? err.response.data : err.message);
             Swal.fire("Gagal", "Terjadi kesalahan", "error")
             console.log(err)
         }
