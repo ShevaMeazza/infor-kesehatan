@@ -43,7 +43,7 @@ export default function RekamMedisList() {
                                 <th className="p-3 text-left">Diagnosa</th>
                                 <th className="p-3 text-left">Tindakan</th>
                                 <th className="p-3 text-left">Tanggal</th>
-                                <th className="p-3 text-left">Aksi</th>
+                                {/* <th className="p-3 text-left">Aksi</th> */}
                             </tr>
                         </thead>
 
@@ -57,14 +57,14 @@ export default function RekamMedisList() {
                                     <td className="p-3">{rm.diagnosa}</td>
                                     <td className="p-3">{rm.tindakan}</td>
                                     <td className="p-3">{new Date(rm.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</td>                                    
-                                    <td className="p-3">
+                                    {/* <td className="p-3">
                                         <Link
                                             to={`/rekam-medis/${rm.id}`}
                                             className="text-yellow-300 hover:underline"
                                         >
                                             Edit
                                         </Link>
-                                    </td>
+                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>

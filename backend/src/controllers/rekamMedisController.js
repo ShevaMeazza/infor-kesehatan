@@ -40,7 +40,7 @@ export const addRekamMedis = async (req, res) => {
         }
         
         await connection.query(
-            "UPDATE pendaftaran SET status = 'menunggu_pembayaran' WHERE id = ?",
+            "UPDATE pendaftaran SET status = 'Menunggu Pembayaran' WHERE id = ?",
             [pendaftaran_id]
         )
 

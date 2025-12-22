@@ -6,7 +6,7 @@ export const insertRekamMedis = async ({
     dokter_id,
     keluhan,
     diagnosa,
-    tindakan
+    tindakan,
 }) => {
     const sql = `
         INSERT INTO rekam_medis 
@@ -19,27 +19,19 @@ export const insertRekamMedis = async ({
         dokter_id,
         keluhan,
         diagnosa,
-        tindakan
+        tindakan,
     ]);
 
     return result;
 };
 
-export const insertResepObat = async ({
-    rekam_medis_id,
-    obat_id,
-    jumlah
-}) => {
+export const insertResepObat = async ({ rekam_medis_id, obat_id, jumlah }) => {
     const sql = `
         INSERT INTO resep_obat (rekam_medis_id, obat_id, jumlah)
         VALUES (?, ?, ?)
     `;
 
-    const [result] = await pool.query(sql, [
-        rekam_medis_id,
-        obat_id,
-        jumlah
-    ]);
+    const [result] = await pool.query(sql, [rekam_medis_id, obat_id, jumlah]);
 
     return result;
 };
@@ -78,4 +70,37 @@ export const getRekamMedisById = async (id) => {
 
     const [rows] = await pool.query(sql, [id]);
     return rows.length ? rows[0] : null;
+};
+
+export const updateRekamMedis = async ({
+    pendaftaran_id,
+    dokter_id,
+    keluhan,
+    diagnosa,
+    tindakan,
+}) => {
+    // Cek apakah rekam medis sudah ada untuk pendaftaran ini
+    const [existing] = await pool.query(
+        "SELECT id FROM rekam_medis WHERE pendaftaran_id = ?",
+        [pendaftaran_id]
+    );
+
+    if (existing.length > 0) {
+        // Update jika sudah ada
+        const sql = `UPDATE rekam_medis SET diagnosa = ?, tindakan = ? WHERE pendaftaran_id = ?`;
+        await pool.query(sql, [diagnosa, tindakan, pendaftaran_id]);
+        return { id: existing[0].id, message: "Rekam medis diperbarui" };
+    } else {
+        // Insert baru jika belum ada
+        const sql = `INSERT INTO rekam_medis (pendaftaran_id, dokter_id, keluhan, diagnosa, tindakan, tanggal) 
+            VALUES (?, ?, ?, ?, ?, CURDATE())`;
+        const [result] = await pool.query(sql, [
+            pendaftaran_id,
+            dokter_id,
+            keluhan,
+            diagnosa,
+            tindakan,
+        ]);
+        return { id: result.insertId, message: "Rekam medis berhasil dibuat" };
+    }
 };

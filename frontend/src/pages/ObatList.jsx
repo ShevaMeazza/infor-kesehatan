@@ -29,7 +29,7 @@ export default function ObatList() {
                 <h1 className="text-2xl font-semibold">Data Obat</h1>
 
                 <Link
-                    to="/obat/tambah"
+                    to="/tambah-obat"
                     className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
                 >
                     + Tambah Obat

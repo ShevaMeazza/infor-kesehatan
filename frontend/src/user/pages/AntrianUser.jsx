@@ -12,12 +12,15 @@ export default function AntrianUser() {
             const res = await api.get(`/pendaftaran/${id}`)
             setData(res.data)
 
-            if (res.data.status === "dipanggil") {
-                console.log("Pasin Dipanggil")
+            const currentStatus = res.data.status.toLowerCase()
+
+            if (currentStatus === "dipanggil") {
+                console.log("Pasien Dipanggil")
             }
 
-            if (res.data.status === "selesai") {
-                nav(`/menunggu-obat/${id}`)
+            if (currentStatus === "menunggu pembayaran") {
+                console.log("mengalihkan ke pembayaran")
+                nav(`/pembayaran-pasien/${id}`)
             }
         } catch (err) {
             console.error(err)
@@ -33,9 +36,11 @@ export default function AntrianUser() {
     if (!data) return <p className="p-10">Loading...</p>
 
     const statusColor = {
-        menunggu: "text-yellow-600 bg-yellow-100",
-        dipanggil: "text-blue-600 bg-blue-100",
-        selesai: "text-green-600 bg-green-100",
+        "menunggu": "bg-yellow-100 text-yellow-700",
+        "dipanggil": "bg-blue-100 text-blue-700",            
+        "pemeriksaan": "bg-purple-100 text-purple-700",
+        "menunggu pembayaran": "bg-orange-100 text-orange-700",
+        "selesai": "bg-green-100 text-green-700"
     }
 
     return (

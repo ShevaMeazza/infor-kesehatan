@@ -33,6 +33,19 @@
   }
 }
 
+@media print {    
+    button, .no-print, .bg-gray-100 {
+        display: none !important;
+    }
+    body {
+        background-color: white !important;
+    }
+    .shadow-2xl {
+        box-shadow: none !important;
+        border: none !important;
+    }
+}
+
 .card {
   padding: 2em;
 }

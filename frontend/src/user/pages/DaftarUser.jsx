@@ -31,8 +31,7 @@ export default function DaftarUser() {
                 alamat: form.alamat,
                 no_hp: form.no_hp
             });
-
-            // tambah pasien
+            
             const resPasien = await api.post("/pasien", {
                 nama: form.nama,
                 nik: form.nik,

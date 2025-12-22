@@ -17,6 +17,9 @@ import MenungguObat from "./user/pages/MenungguObat";
 import RekamMedisList from "./pages/RekamMedisList";
 import RekamMedisForm from "./pages/RekamMedisForm";
 import ObatList from "./pages/ObatList";
+import PembayaranPasien from "./user/pages/PembayaranPasien";
+import Pembayaran from "./pages/PembayaranList";
+import TambahObat from "./pages/TambahObat";
 
 export default function App() {
   return (
@@ -26,6 +29,7 @@ export default function App() {
       <Route path="/daftar" element={<DaftarUser />} />
       <Route path="/antrian/:id" element={<AntrianUser />} />
       <Route path="/menunggu-obat/:id" element={<MenungguObat />} />
+      <Route path="/pembayaran-pasien/:id" element={<PembayaranPasien />} />
 
       {/* admin */}
       <Route
@@ -33,7 +37,7 @@ export default function App() {
         element={
           <MainLayout>
             <Routes>
-              <Route path="/admin" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dokter" element={<DokterList />} />
               <Route path="/pendaftaran" element={<PendaftaranList />} />
               <Route path="/poli" element={<PoliList />} />
@@ -43,6 +47,8 @@ export default function App() {
               <Route path="/obat" element={<ObatList />} />
               <Route path="/rekam-medis" element={<RekamMedisList />} />
               <Route path="/rekam-medis/:id" element={<RekamMedisForm />} />
+              <Route path="/pembayaran" element={<Pembayaran />} />
+              <Route path="/tambah-obat" element={<TambahObat />} />              
             </Routes>
           </MainLayout>
         }

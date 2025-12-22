@@ -5,21 +5,38 @@ import {
     updateDokter,
     deleteDokter
 } from "../models/dokterModel.js";
+import pool from "../config/db.js";
 
 export const listDokter = async (req, res) => {
-    try {
-        const data = await getAllDokter();
-        res.json(data);
+    try {        
+        const sql = `
+            SELECT d.*, p.nama_poli 
+            FROM dokter d 
+            LEFT JOIN poli p ON d.poli_id = p.id
+        `;
+        const [rows] = await pool.query(sql);
+        res.json(rows);
     } catch (err) {
-        // Konsisten gunakan err atau error
         res.status(500).json({ message: err.message });
     }
-}
+};
+
+export const createDokter = async (req, res) => {
+    const { nama, spesialis, harga_dokter, poli_id } = req.body;
+    try {
+        await pool.query(
+            "INSERT INTO dokter (nama, spesialis, harga_dokter, poli_id) VALUES (?, ?, ?, ?)",
+            [nama, spesialis, harga_dokter, poli_id]
+        );
+        res.status(201).json({ message: "Dokter berhasil ditambahkan" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
 
 export const detailDokter = async (req, res) => {
     try {
-        const { id } = req.params;
-        // 1. TAMBAHKAN AWAIT: Tanpa await, data akan berisi Promise, bukan hasil query
+        const { id } = req.params;        
         const data = await getDokterById(id);
 
         if (!data || data.length === 0) {
@@ -32,22 +49,19 @@ export const detailDokter = async (req, res) => {
     }
 }
 
-export const createDokter = async (req, res) => {
+export const getDokter = async (req, res) => {
     try {
-        const { nama, spesialis, poli_id } = req.body;
-        if (!nama || !spesialis) {
-            return res.status(400).json({ message: "Nama dan Spesialis wajib diisi" });
-        }
-
-        await tambahDokter({ nama, spesialis, poli_id });
-    
-        res.status(201).json({
-            message: "Berhasil menambahkan dokter",            
-        });
-    } catch (err) { // 2. PERBAIKAN: Ubah 'error' menjadi 'err' agar sesuai dengan res.json
+        const sql = `
+            SELECT d.*, p.nama_poli 
+            FROM dokter d 
+            LEFT JOIN poli p ON d.poli_id = p.id
+        `;
+        const [rows] = await pool.query(sql);
+        res.json(rows);
+    } catch (err) {
         res.status(500).json({ message: err.message });
     }
-}
+};
 
 export const editDokter = async (req, res) => {
     try {

@@ -43,6 +43,18 @@ export const kurangiStok = async (obat_id, jumlah) => {
     return result
 }
 
+export const tambahObatKeResep = async (rekam_medis_id, obat_id, jumlah) => {
+    // Ambil harga obat dari master obat untuk hitung total nanti
+    const [obat] = await pool.query("SELECT harga FROM obat WHERE id = ?", [obat_id]);
+    const harga_satuan = obat[0]?.harga || 0;
+    const subtotal = harga_satuan * jumlah;
+
+    const sql = `INSERT INTO resep_obat (rekam_medis_id, obat_id, jumlah, harga_satuan, subtotal) 
+        VALUES (?, ?, ?, ?, ?)`;
+    const [result] = await pool.query(sql, [rekam_medis_id, obat_id, jumlah, harga_satuan, subtotal]);
+    return result;
+};
+
 export const cekStok = async (obat_id) => {
     const sql = "SELECT stok FROM obat WHERE id = ?"
     const [rows] = await pool.query(sql, [obat_id])

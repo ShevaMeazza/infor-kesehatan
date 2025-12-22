@@ -8,26 +8,31 @@ export const getNextAntrian = async (poli_id) => {
 }
 
 export const tambahPendaftaran = async ({ pasien_id, poli_id }) => {
-    const no_antrian = await getNextAntrian(poli_id)
-
+    const no_antrian = await getNextAntrian(poli_id);
+    
     const sql = `
-    INSERT INTO pendaftaran (pasien_id, poli_id, tanggal, status, no_antrian)
-    VALUES (?, ?, CURDATE(), 'menunggu', ?)`
-    const [result] = await pool.query(sql, [pasien_id, poli_id, no_antrian])
+        INSERT INTO pendaftaran (pasien_id, poli_id, tanggal, status, no_antrian)
+        VALUES (?, ?, CURDATE(), 'menunggu', ?)
+    `;
+    
+    const [result] = await pool.query(sql, [pasien_id, poli_id, no_antrian]);
+    return { insertId: result.insertId, no_antrian };
+};
 
-    return { insertId: result.insertId, no_antrian }
-}
-
-export const getAllPendaftaran = async () => {
+export const getAllPendaftaran = async () => {    
     const sql = `
-    SELECT p.*, pa.nama AS nama_pasien, po.nama_poli
-    FROM pendaftaran p
-    JOIN pasien pa ON p.pasien_id = pa.id
-    JOIN poli po ON p.poli_id = po.id
-    ORDER BY p.tanggal DESC, p.no_antrian ASC`
-    const [rows] = await pool.query(sql)
-    return rows
-}
+        SELECT 
+            p.*, 
+            ps.nama AS nama_pasien, 
+            pl.nama_poli 
+        FROM pendaftaran p
+        JOIN pasien ps ON p.pasien_id = ps.id
+        JOIN poli pl ON p.poli_id = pl.id
+        ORDER BY p.tanggal DESC
+    `;
+    const [rows] = await pool.query(sql);
+    return rows;
+};
 
 export const getPendaftaranById = async (id) => {
     const sql = `

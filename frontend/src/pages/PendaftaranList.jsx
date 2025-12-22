@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react"
-// Menggunakan useNavigate untuk navigasi programatik
-import { Link, useNavigate } from "react-router-dom" 
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import api from "../api/axios"
 import Swal from "sweetalert2"
 
-export default function Pendaftaran() {    
+export default function Pendaftaran() {
     const navigate = useNavigate()
 
     const [editId, setEditId] = useState(null)
@@ -28,14 +27,24 @@ export default function Pendaftaran() {
         fetchPendaftaran()
     }, [])
 
-    const StatusBadge = ({status}) => {
+    const StatusBadge = ({ status }) => {
+        const s = status ? status.toLowerCase() : ""
+
         const colors = {
-            menunggu: "bg-yellow-100 text-yellow-700",
-            dipanggil: "bg-blue-100 text-blue-700",            
-            pemeriksaan: "bg-purple-100 text-purple-700", 
-            selesai: "bg-green-100 text-green-700"
+            "menunggu": "bg-yellow-100 text-yellow-700",
+            "dipanggil": "bg-blue-100 text-blue-700",
+            "pemeriksaan": "bg-purple-100 text-purple-700",
+            "menunggu pembayaran": "bg-orange-100 text-orange-700",
+            "selesai": "bg-green-100 text-green-700"
         }
-        return <span className={`px-3 py-1 rounded text-sm font-medium ${colors[status]}`}>{status}</span>;
+
+        const activeColor = colors[s] || "bg-gray-100 text-gray-700"
+
+        return (
+            <span className={`px-3 py-1 rounded text-xs font-medium uppercase tracking-wider ${activeColor}`}>
+                {status}
+            </span>
+        )
     }
 
     const openEditModal = (id, currentStatus) => {
@@ -46,20 +55,60 @@ export default function Pendaftaran() {
 
     const handleUpdateStatus = async () => {
         try {
-            await api.put(`/pendaftaran/${editId}`, { status: newStatus })
-            Swal.fire("Berhasil", "Status Berhasil diperbarui", "success")
-            setShowModal(false)
-            fetchPendaftaran()
-            
-            if (newStatus === "pemeriksaan") {                
+            let payload = { status: newStatus };
+
+            if (newStatus === "selesai") {
+                const resDetail = await api.get(`/pendaftaran/${editId}`);
+                const detail = resDetail.data;
+
+                if (!detail.rekam_medis_id) {
+                    return Swal.fire("Gagal", "Rekam medis tidak ditemukan", "error");
+                }
+
+                const resResep = await api.get(`/resep-obat/pendaftaran/${editId}`);
+                const resep = resResep.data;
+                const totalObat = resep.reduce((acc, item) => acc + (item.harga * item.jumlah), 0);
+
+                payload = {
+                    ...payload,
+                    rekam_medis_id: detail.rekam_medis_id,
+                    total_obat: totalObat,
+                    total_biaya: (detail.biaya_dokter || 0) + totalObat
+                };
+            }
+
+            // Proses Update ke Backend
+            await api.put(`/pendaftaran/${editId}`, payload);
+
+            setShowModal(false); // Tutup modal dulu
+
+            // Alert Sukses
+            await Swal.fire({
+                title: "Berhasil!",
+                text: newStatus === "selesai"
+                    ? "Pembayaran telah dicatat. Dialihkan ke data pembayaran..."
+                    : "Status berhasil diperbarui",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            // REFRESH DATA ANTRIAN
+            fetchPendaftaran();
+
+            if (newStatus === "selesai") {
+                navigate("/pembayaran");
+            }
+
+            if (newStatus === "pemeriksaan") {
                 navigate(`/rekam-medis/${editId}`)
             }
 
         } catch (error) {
-            Swal.fire("Gagal", "Terjadi kesalahan saat update status", "error")
-            console.error("Error update status:", error);
+            console.error(error);
+            Swal.fire("Gagal", "Terjadi kesalahan saat memproses data", "error");
         }
-    }
+    };
 
     const handleDelete = async (id) => {
         const confirm = await Swal.fire({
@@ -142,7 +191,7 @@ export default function Pendaftaran() {
                     </table>
                 </div>
             )}
-            
+
             {/* Modal Edit Status */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -156,8 +205,8 @@ export default function Pendaftaran() {
                         >
                             <option value="menunggu">Menunggu</option>
                             <option value="dipanggil">Dipanggil</option>
-                            {/* Tambahkan status 'pemeriksaan' di modal */}
-                            <option value="pemeriksaan">Pemeriksaan</option> 
+                            <option value="pemeriksaan">Pemeriksaan</option>
+                            <option value="menunggu pembayaran">Menunggu Pembayaran</option>
                             <option value="selesai">Selesai</option>
                         </select>
 

@@ -6,7 +6,6 @@ export default function MainLayout({ children }) {
         <div>
             <Sidebar />
             <Navbar />
-
             <main className="pt-20 pl-64 pr-6 pb-6 min-h-screen bg-gray-50">
                 {children}
             </main>

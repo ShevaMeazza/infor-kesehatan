@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
     const menu = [
-        { name: "Dashboard", path: "/" },
+        { name: "Dashboard", path: "/dashboard" },
         { name: "Pasien", path: "/pasien" },
         { name: "Dokter", path: "/dokter" },
         { name: "Poli", path: "/poli" },

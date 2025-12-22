@@ -26,6 +26,7 @@ app.use('/pendaftaran', pendaftaranRoutes)
 app.use('/obat', obatRoutes)
 app.use('/rekam-medis', rekamMedisRoutes)
 app.use('/resep', resepRoutes)
+app.use('/resep-obat', resepRoutes)
 app.use('/pembayaran',pembayaranRoutes)
 
 app.listen(5001, () => console.log(`Server running on port 5001`))
